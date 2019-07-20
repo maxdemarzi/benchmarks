@@ -13,11 +13,11 @@ class InteractiveComplex14 extends Simulation {
 
   val query =
     """MATCH path = allShortestPaths((person1:Person {id:$person1Id})-[:KNOWS*..15]-(person2:Person {id:$person2Id}))
-      WITH nodes(path) AS pathNodes
-      RETURN
-        extract(n IN pathNodes  n.id) AS personIdsInPath,
-        reduce(weight=0.0, idx IN range(1,size(pathNodes)-1)  extract(prev IN [pathNodes[idx-1]]  extract(curr IN [pathNodes[idx]]  weight + length((curr)<-[:HAS_CREATOR]-(:Comment)-[:REPLY_OF]->(:Post)-[:HAS_CREATOR]->(prev))*1.0 + length((prev)<-[:HAS_CREATOR]-(:Comment)-[:REPLY_OF]->(:Post)-[:HAS_CREATOR]->(curr))*1.0 + length((prev)-[:HAS_CREATOR]-(:Comment)-[:REPLY_OF]-(:Comment)-[:HAS_CREATOR]-(curr))*0.5) )[0][0]) AS pathWight
-      ORDER BY pathWight DESC
+       WITH nodes(path) AS pathNodes
+       RETURN
+        extract(n IN pathNodes | n.id) AS personIdsInPath,
+        reduce(weight=0.0, idx IN range(1,size(pathNodes)-1) | extract(prev IN [pathNodes[idx-1]] | extract(curr IN [pathNodes[idx]] | weight + length((curr)<-[:HAS_CREATOR]-(:Comment)-[:REPLY_OF]->(:Post)-[:HAS_CREATOR]->(prev))*1.0 + length((prev)<-[:HAS_CREATOR]-(:Comment)-[:REPLY_OF]->(:Post)-[:HAS_CREATOR]->(curr))*1.0 + length((prev)-[:HAS_CREATOR]-(:Comment)-[:REPLY_OF]-(:Comment)-[:HAS_CREATOR]-(curr))*0.5) )[0][0]) AS pathWeight
+       ORDER BY pathWeight DESC
     """.stripMargin.replaceAll("\n", " ")
 
   val statements = """{"statements" : [{"statement" : "%s", "parameters" : { "person1Id": 8796093030404, "person2Id": 26388279074461} }] }"""

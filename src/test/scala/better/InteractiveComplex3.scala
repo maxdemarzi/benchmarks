@@ -46,7 +46,7 @@ class InteractiveComplex3 extends Simulation {
   val statements = """{"statements" : [{"statement" : "%s", "parameters" : { "personId": 17592186055119, "startDate": 20120501000000000, "duration":42000000000, "countryXName":'Laos', "countryYName":'Scotland' } }] }"""
     .format(query)
 
-  val scn = scenario("theirs.InteractiveComplex3")
+  val scn = scenario("better.InteractiveComplex3")
     .during(30 ) {
         exec(
           http("IC-3 (better)")
