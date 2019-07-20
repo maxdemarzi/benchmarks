@@ -1,4 +1,4 @@
-package theirs
+package better
 
 import io.gatling.core.Predef._
 import io.gatling.core.scenario.Simulation
@@ -12,10 +12,10 @@ class InteractiveComplex11 extends Simulation {
     .basicAuth("neo4j", "benchmark")
 
   val query =
-    """MATCH (person:Person {id:$personId})-[:KNOWS*1..2]-(friend:Person)
+    """MATCH (person:Person {id:$personId})-[:KNOWS*1..2]-(friend)
       WHERE not(person=friend)
       WITH DISTINCT friend
-      MATCH (friend)-[workAt:WORK_AT]->(company:Organisation)-[:IS_LOCATED_IN]->(:Place {name:$countryName})
+      MATCH (friend)-[workAt:WORK_AT]->(company)-[:IS_LOCATED_IN]->({name:$countryName})
       WHERE workAt.workFrom < $workFromYear
       RETURN
         friend.id AS personId,
@@ -23,17 +23,17 @@ class InteractiveComplex11 extends Simulation {
         friend.lastName AS personLastName,
         company.name AS organizationName,
         workAt.workFrom AS organizationWorkFromYear
-      ORDER BY organizationWorkFromYear ASC, toInteger(personId) ASC, organizationName DESC
+      ORDER BY organizationWorkFromYear ASC, personId ASC, organizationName DESC
       LIMIT 10
     """.stripMargin.replaceAll("\n", " ")
 
   val statements = """{"statements" : [{"statement" : "%s", "parameters" : { "personId": 30786325583618, "countryName": "Laos", "workFromYear": 2010} }] }"""
     .format(query)
 
-  val scn = scenario("theirs.InteractiveComplex11")
+  val scn = scenario("better.InteractiveComplex11")
     .during(30 ) {
         exec(
-          http("IC-11 (theirs)")
+          http("IC-11 (better)")
             .post("/db/data/transaction/commit")
             .body(StringBody(statements))
             .asJson
