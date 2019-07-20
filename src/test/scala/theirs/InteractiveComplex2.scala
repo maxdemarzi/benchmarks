@@ -31,10 +31,10 @@ class InteractiveComplex2 extends Simulation {
   val statements = """{"statements" : [{"statement" : "%s", "parameters" : { "personId": 17592186052613, "maxDate": 20120501000000000  } }] }"""
     .format(query)
 
-  val scn = scenario("theirs.InteractiveComplex1")
+  val scn = scenario("theirs.InteractiveComplex2")
     .during(30 ) {
         exec(
-          http("IC-1 (theirs)")
+          http("IC-2 (theirs)")
             .post("/db/data/transaction/commit")
             .body(StringBody(statements))
             .asJson
