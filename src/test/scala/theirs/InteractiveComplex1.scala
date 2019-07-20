@@ -59,7 +59,7 @@ class InteractiveComplex1 extends Simulation {
       LIMIT 20
     """.stripMargin.replaceAll("\n", " ")
 
-  val statements = """{"statements" : [{"statement" : "%s", "parameters" : { "personId": 30786325583618, "firstName", "Carmen" } }] }"""
+  val statements = """{"statements" : [{"statement" : "%s", "parameters" : { "personId": 30786325583618, "firstName": "Carmen" } }] }"""
     .format(query)
 
   val scn = scenario("theirs.InteractiveComplex1")
