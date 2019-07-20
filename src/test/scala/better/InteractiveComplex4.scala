@@ -1,4 +1,4 @@
-package theirs
+package better
 
 import io.gatling.core.Predef._
 import io.gatling.core.scenario.Simulation
@@ -12,17 +12,21 @@ class InteractiveComplex4 extends Simulation {
     .basicAuth("neo4j", "benchmark")
 
   val query =
-    """MATCH (person:Person {id:$personId})-[:KNOWS]-(:Person)<-[:HAS_CREATOR]-(post:Post)-[:HAS_TAG]->(tag:Tag)
-      WHERE post.creationDate >= $startDate
-         AND post.creationDate < ($startDate + $duration)
-      WITH person, count(post) AS postsOnTag, tag
-      OPTIONAL MATCH (person)-[:KNOWS]-()<-[:HAS_CREATOR]-(oldPost:Post)-[:HAS_TAG]->(tag)
-      WHERE oldPost.creationDate < $startDate
-      WITH person, postsOnTag, tag, count(oldPost) AS cp
-      WHERE cp = 0
-      RETURN
-        tag.name AS tagName,
-        sum(postsOnTag) AS postCount
+    """MATCH (person:Person {id:$personId})-[:KNOWS]-(friend),
+       (friend)<-[:HAS_CREATOR]-(post)-[:HAS_TAG]->(tag)
+      WITH DISTINCT tag, post
+      WITH tag,
+      CASE
+        WHEN ($startDate + $duration) > post.creationDate >= $startDate THEN 1
+        ELSE 0
+      END AS valid,
+      CASE
+        WHEN $startDate > post.creationDate THEN 1
+        ELSE 0
+      END AS inValid
+      WITH tag, sum(valid) AS postCount, sum(inValid) AS inValidPostCount
+      WHERE postCount>0 AND inValidPostCount=0
+      RETURN tag.name AS tagName, postCount
       ORDER BY postCount DESC, tagName ASC
       LIMIT 10
     """.stripMargin.replaceAll("\n", " ")
@@ -30,10 +34,10 @@ class InteractiveComplex4 extends Simulation {
   val statements = """{"statements" : [{"statement" : "%s", "parameters" : { "personId": 21990232559429, "startDate": 20120501000000000, "duration": 37000000000} }] }"""
     .format(query)
 
-  val scn = scenario("theirs.InteractiveComplex4")
+  val scn = scenario("better.InteractiveComplex4")
     .during(30 ) {
         exec(
-          http("IC-4 (theirs)")
+          http("IC-4 (better)")
             .post("/db/data/transaction/commit")
             .body(StringBody(statements))
             .asJson
