@@ -64,13 +64,13 @@ class InteractiveComplex1 extends Simulation {
     .format(query)
 
   val scn = scenario("better.InteractiveComplex1")
-    .during(1 ) {
+    .during(30 ) {
         exec(
           http("IC-1 (better)")
             .post("/db/data/transaction/commit")
             .body(StringBody(statements))
             .asJson
-            .check(status.is(200))           
+            .check(status.is(200))
         )
     }
 
