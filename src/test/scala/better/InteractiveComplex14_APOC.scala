@@ -38,7 +38,7 @@ class InteractiveComplex14_APOC extends Simulation {
   val scn = scenario("better.InteractiveComplex14_APOC")
     .during(30 ) {
       exec(
-        http("IC-14 (better)")
+        http("IC-14 (better apoc)")
           .post("/db/data/transaction/commit")
           .body(StringBody(statements))
           .asJson
