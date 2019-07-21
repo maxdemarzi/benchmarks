@@ -16,7 +16,10 @@ class InteractiveComplex14_APOC extends Simulation {
              WITH nodes(path) AS pathNodes
              UNWIND pathNodes as node
              WITH collect(DISTINCT pathNodes) as paths, collect(distinct node) as nodes
-             WITH paths, [node in nodes | [node.id, {posts:[(node)<-[:HAS_CREATOR]-(p:Post) | p], comments:[(node)<-[:HAS_CREATOR]-(comment:Comment) | comment]}]] as nodePostsAndComments
+             UNWIND nodes as node
+             OPTIONAL MATCH (node)<-[:HAS_CREATOR]-(comment:Comment)-[:REPLY_OF]-()-[:HAS_CREATOR]->(poster) WHERE poster IN nodes
+             WITH paths, node, collect(DISTINCT comment) as comments
+             WITH paths, collect([node.id, node {posts:[(node)<-[:HAS_CREATOR]-(p:Post) | p], comments}]) as nodePostsAndComments
              WITH paths, apoc.map.fromPairs(nodePostsAndComments) as commentsMap
              UNWIND paths as pathNodes
              UNWIND apoc.coll.pairsMin(pathNodes) as pair
