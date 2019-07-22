@@ -19,7 +19,11 @@ Data
 
 The Neo4j graph.db database linked above only has the minimal indexes.
 
-InteractiveComplex queries require:
+Interactive Complex queries require:
 
-CREATE INDEX ON :Person(firstName);
+    CREATE INDEX ON :Person(firstName);
+
+Business Intelligence Query 14 benefits from:
+
+    CREATE INDEX ON :Post(creationDate)
 
