@@ -1,4 +1,4 @@
-package theirs
+package better
 
 import io.gatling.core.Predef._
 import io.gatling.core.scenario.Simulation
@@ -12,12 +12,11 @@ class BusinessIntelligence12 extends Simulation {
     .basicAuth("neo4j", "benchmark")
 
   val query =
-    """MATCH
-        (message:Message)-[:HAS_CREATOR]->(creator:Person),
-        (message)<-[like:LIKES]-(:Person)
+    """MATCH (message:Message)
       WHERE message.creationDate > $date
-      WITH message, creator, count(like) AS likeCount
-      WHERE likeCount > $likeThreshold
+        AND size((message)<-[:LIKES]-()) > 400
+      WITH message, size((message)<-[:LIKES]-()) AS likeCount
+      MATCH (message)-[:HAS_CREATOR]->(creator:Person)
       RETURN
         message.id,
         message.creationDate,
@@ -33,10 +32,10 @@ class BusinessIntelligence12 extends Simulation {
   val statements = """{"statements" : [{"statement" : "%s", "parameters" : { "date": 20120501000000000, "likeThreshold": 400 } }] }"""
     .format(query)
 
-  val scn = scenario("theirs.BusinessIntelligence12")
+  val scn = scenario("better.BusinessIntelligence12")
     .during(30 ) {
         exec(
-          http("BI-12 (theirs)")
+          http("BI-12 (better)")
             .post("/db/data/transaction/commit")
             .body(StringBody(statements))
             .asJson
