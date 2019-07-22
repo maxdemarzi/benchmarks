@@ -15,7 +15,7 @@ class BusinessIntelligence14 extends Simulation {
     """MATCH (post:Post)
       WHERE  $endDate >= post.creationDate >= $startDate
       WITH post
-      MATCH  <-[:REPLY_OF*0..]-(reply)
+      MATCH (post)<-[:REPLY_OF*0..]-(reply)
       WHERE $endDate >= reply.creationDate >= $startDate
       WITH post, reply
       MATCH (person)<-[:HAS_CREATOR]-(post)
